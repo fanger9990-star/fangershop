@@ -1,0 +1,65 @@
+{% extends 'shop/base.html' %}
+
+{% block title %}Checkout | NovaCart{% endblock %}
+{% block description %}Complete your checkout and finalize your NovaCart order securely.{% endblock %}
+
+{% block content %}
+<section class="section">
+    <div class="container checkout-layout">
+        <div class="panel checkout-panel">
+            <div class="section-head compact-head">
+                <h1>Checkout</h1>
+            </div>
+
+            <form method="post" class="checkout-form">
+                {% csrf_token %}
+                <div class="field-group">
+                    <label for="{{ form.customer_name.id_for_label }}">{{ form.customer_name.label }}</label>
+                    {{ form.customer_name }}
+                    {% if form.customer_name.errors %}<div class="error-text">{{ form.customer_name.errors }}</div>{% endif %}
+                </div>
+                <div class="field-row">
+                    <div class="field-group">
+                        <label for="{{ form.customer_email.id_for_label }}">{{ form.customer_email.label }}</label>
+                        {{ form.customer_email }}
+                        {% if form.customer_email.errors %}<div class="error-text">{{ form.customer_email.errors }}</div>{% endif %}
+                    </div>
+                    <div class="field-group">
+                        <label for="{{ form.customer_phone.id_for_label }}">{{ form.customer_phone.label }}</label>
+                        {{ form.customer_phone }}
+                        {% if form.customer_phone.errors %}<div class="error-text">{{ form.customer_phone.errors }}</div>{% endif %}
+                    </div>
+                </div>
+                <div class="field-group">
+                    <label for="{{ form.address.id_for_label }}">{{ form.address.label }}</label>
+                    {{ form.address }}
+                    {% if form.address.errors %}<div class="error-text">{{ form.address.errors }}</div>{% endif %}
+                </div>
+                <button type="submit" class="btn">Place order</button>
+            </form>
+        </div>
+
+        <aside class="panel checkout-summary">
+            <h2>Order summary</h2>
+            {% for item in cart_items %}
+                <div class="summary-line">
+                    <span>{{ item.product.name }} × {{ item.quantity }}</span>
+                    <strong>${{ item.item_total|floatformat:2 }}</strong>
+                </div>
+            {% endfor %}
+            <div class="summary-row">
+                <span>Subtotal</span>
+                <strong>${{ subtotal|floatformat:2 }}</strong>
+            </div>
+            <div class="summary-row">
+                <span>Shipping</span>
+                <strong>${{ shipping|floatformat:2 }}</strong>
+            </div>
+            <div class="summary-row total-row">
+                <span>Total</span>
+                <strong>${{ total|floatformat:2 }}</strong>
+            </div>
+        </aside>
+    </div>
+</section>
+{% endblock %}

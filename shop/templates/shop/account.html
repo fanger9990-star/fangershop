@@ -1,0 +1,139 @@
+{% extends 'shop/base.html' %}
+{% load static %}
+
+{% block title %}My account | NovaCart{% endblock %}
+{% block description %}Your NovaCart home base: orders, saved products, recent views, and conversations.{% endblock %}
+
+{% block content %}
+<section class="section account-page">
+    <div class="container">
+        <div class="account-hero">
+            <div class="account-avatar" aria-hidden="true">{{ account_user.first_name|default:account_user.username|slice:':1'|upper }}</div>
+            <div class="account-intro">
+                <span class="section-eyebrow">Your NovaCart</span>
+                <h1>Good to have you, {{ account_user.first_name|default:account_user.username }}.</h1>
+                <p>One place for your orders, saved finds, and conversations.</p>
+                <span class="account-email">{{ account_user.email }}</span>
+            </div>
+            <a href="{% url 'update_account' %}" class="btn btn-secondary">Edit personal details</a>
+        </div>
+
+        <div class="account-stats">
+            <a href="#orders"><strong>{{ order_count }}</strong><span>Orders</span></a>
+            <a href="{% url 'wishlist' %}"><strong>{{ wishlist_count }}</strong><span>Saved finds</span></a>
+            <a href="{% url 'messages' %}"><strong>{{ thread_count }}</strong><span>Conversations</span></a>
+            <a href="{% url 'product_compare' %}"><strong>{{ compare_count }}</strong><span>Comparing</span></a>
+        </div>
+        <div class="account-seller-tools">
+            <span><strong>Selling on NovaCart?</strong> Keep your shop moving.</span>
+            <a href="{% url 'seller_dashboard' %}">Seller dashboard →</a>
+            <a href="{% url 'create_listing' %}">Add a product →</a>
+            <a href="{% url 'profile' %}">Shop profile →</a>
+        </div>
+
+        <section class="account-section" id="orders">
+            <div class="section-head account-section-head">
+                <div><span class="section-eyebrow">Your purchases</span><h2>Order history</h2></div>
+                <a href="{% url 'product_list' %}" class="text-link">Find something new <span aria-hidden="true">→</span></a>
+            </div>
+            {% if orders %}
+                <div class="order-list">
+                    {% for order in orders %}
+                        <article class="order-card">
+                            <div class="order-card-top">
+                                <div><span class="order-number">Order #{{ order.id }}</span><time>{{ order.created_at|date:'M d, Y' }}</time></div>
+                                <span class="order-status">{{ order.get_status_display }}</span>
+                            </div>
+                            <div class="order-products">
+                                {% for item in order.items.all %}
+                                    <a href="{% url 'product_detail' item.product.slug %}">{{ item.product.name }} <span>× {{ item.quantity }}</span></a>
+                                {% endfor %}
+                            </div>
+                            <div class="order-card-bottom"><span>{{ order.customer_name }}</span><strong>${{ order.total|floatformat:2 }}</strong></div>
+                        </article>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="account-empty"><span>Nothing here just yet.</span><a href="{% url 'product_list' %}">Your next favorite find is waiting →</a></div>
+            {% endif %}
+        </section>
+
+        {% if saved_products %}
+            <section class="account-section">
+                <div class="section-head account-section-head">
+                    <div><span class="section-eyebrow">Kept close</span><h2>Your saved finds</h2></div>
+                    <a href="{% url 'wishlist' %}" class="text-link">View wishlist <span aria-hidden="true">→</span></a>
+                </div>
+                <div class="products-grid account-product-grid">
+                    {% for product in saved_products %}
+                        <article class="product-card">
+                            <a class="product-image" href="{% url 'product_detail' product.slug %}">
+                                {% if product.images.first %}<img src="{{ product.images.first.image.url }}" alt="{{ product.name }}" loading="lazy">{% else %}<img src="{% static product.image %}" alt="{{ product.name }}" loading="lazy">{% endif %}
+                            </a>
+                            <div class="product-body"><div class="product-meta"><h3><a href="{% url 'product_detail' product.slug %}">{{ product.name }}</a></h3><span class="product-price">${{ product.price|floatformat:2 }}</span></div></div>
+                        </article>
+                    {% endfor %}
+                </div>
+            </section>
+        {% endif %}
+
+        {% if recommendations %}
+            <section class="account-section">
+                <div class="section-head account-section-head">
+                    <div><span class="section-eyebrow">Based on your browsing</span><h2>More your kind of thing</h2></div>
+                    <span class="recommendation-note">Your taste, getting smarter</span>
+                </div>
+                <div class="products-grid account-product-grid">
+                    {% for product in recommendations %}
+                        <article class="product-card">
+                            <a class="product-image" href="{% url 'product_detail' product.slug %}">
+                                {% if product.images.first %}<img src="{{ product.images.first.image.url }}" alt="{{ product.name }}" loading="lazy">{% else %}<img src="{% static product.image %}" alt="{{ product.name }}" loading="lazy">{% endif %}
+                                <span class="product-tag">Picked for you</span>
+                            </a>
+                            <div class="product-body"><div class="product-meta"><h3><a href="{% url 'product_detail' product.slug %}">{{ product.name }}</a></h3><span class="product-price">${{ product.price|floatformat:2 }}</span></div><a class="text-link" href="{% url 'product_detail' product.slug %}">Take a look →</a></div>
+                        </article>
+                    {% endfor %}
+                </div>
+            </section>
+        {% endif %}
+
+        {% if recent_products %}
+            <section class="account-section">
+                <div class="section-head account-section-head">
+                    <div><span class="section-eyebrow">Right where you left off</span><h2>Recently viewed</h2></div>
+                    <a href="{% url 'product_list' %}" class="text-link">Keep exploring <span aria-hidden="true">→</span></a>
+                </div>
+                <div class="recent-view-list">
+                    {% for product in recent_products %}
+                        <a href="{% url 'product_detail' product.slug %}">
+                            <span class="recent-view-thumb">{% if product.images.first %}<img src="{{ product.images.first.image.url }}" alt="">{% else %}<img src="{% static product.image %}" alt="">{% endif %}</span>
+                            <span><strong>{{ product.name }}</strong><small>{{ product.category.name|default:'NovaCart find' }}</small></span>
+                            <b>${{ product.price|floatformat:2 }}</b>
+                        </a>
+                    {% endfor %}
+                </div>
+            </section>
+        {% endif %}
+
+        <section class="account-section">
+            <div class="section-head account-section-head">
+                <div><span class="section-eyebrow">Stay in touch</span><h2>Your conversations</h2></div>
+                <a href="{% url 'messages' %}" class="text-link">Open inbox <span aria-hidden="true">→</span></a>
+            </div>
+            {% if threads %}
+                <div class="account-thread-list">
+                    {% for thread in threads %}
+                        <a href="{% url 'messages' %}?thread={{ thread.id }}">
+                            <span class="thread-avatar">{% if thread.seller_id == request.user.id %}{{ thread.buyer.username|default:'B'|slice:':1'|upper }}{% else %}{{ thread.seller.username|default:'S'|slice:':1'|upper }}{% endif %}</span>
+                            <span><strong>{% if thread.seller_id == request.user.id %}{{ thread.buyer.username|default:'Buyer' }}{% else %}{{ thread.seller.username|default:'Seller' }}{% endif %}</strong><small>{{ thread.product.name|default:'Product inquiry' }}</small></span>
+                            <time>{{ thread.updated_at|date:'M d' }}</time>
+                        </a>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="account-empty"><span>No conversations yet.</span><a href="{% url 'product_list' %}">Browse products and meet a seller →</a></div>
+            {% endif %}
+        </section>
+    </div>
+</section>
+{% endblock %}

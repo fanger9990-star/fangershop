@@ -1,0 +1,31 @@
+{% extends 'shop/base.html' %}
+
+{% block title %}Log in | NovaCart{% endblock %}
+{% block content %}
+<section class="section auth-section">
+    <div class="container">
+        <div class="auth-card">
+            <span class="section-eyebrow">Welcome back</span>
+            <h1>Good to see you.</h1>
+            <p class="auth-intro">Log in to pick up where you left off.</p>
+            {% if form.errors %}<div class="alert-box" role="alert">Your username or password didn't match. Please try again.</div>{% endif %}
+            <form method="post" class="stacked-form">
+                {% csrf_token %}
+                <div class="field-group">
+                    <label for="{{ form.username.id_for_label }}">Username</label>
+                    {{ form.username }}
+                    {{ form.username.errors }}
+                </div>
+                <div class="field-group">
+                    <label for="{{ form.password.id_for_label }}">Password</label>
+                    {{ form.password }}
+                    {{ form.password.errors }}
+                </div>
+                {% if next %}<input type="hidden" name="next" value="{{ next }}">{% endif %}
+                <button type="submit" class="btn btn-primary auth-submit">Log in</button>
+            </form>
+            <p class="auth-footnote">New to NovaCart? <a href="{% url 'signup_email' %}">Create an account</a></p>
+        </div>
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,171 @@
+{% extends 'shop/base.html' %}
+{% load static %}
+
+{% block title %}NovaCart | Thoughtful finds for modern living{% endblock %}
+{% block description %}Discover useful, well-made tech and everyday essentials from independent sellers. Find your next favorite thing at NovaCart.{% endblock %}
+
+{% block content %}
+<section class="home-hero">
+    <div class="container home-hero-grid">
+        <div class="home-hero-copy">
+            <span class="eyebrow"><span class="eyebrow-dot"></span> A little more thoughtful</span>
+            <h1>Good things.<br><span class="gradient-text">Found here.</span></h1>
+            <p>Discover considered tech, everyday essentials, and independent makers worth knowing. Your next favorite thing is closer than you think.</p>
+            <form class="hero-search" method="get" action="{% url 'product_list' %}">
+                <label class="sr-only" for="home-search">Search products</label>
+                <input id="home-search" type="search" name="q" placeholder="What are you looking for?">
+                <button class="btn btn-primary" type="submit">Explore the shop <span aria-hidden="true">→</span></button>
+            </form>
+            <div class="hero-proof">
+                <span><strong>Curated</strong> finds, not endless scrolling</span>
+                <span><strong>Independent</strong> sellers and makers</span>
+            </div>
+        </div>
+        <div class="home-hero-art" aria-label="NovaCart featured collection">
+            <div class="art-glow"></div>
+            <div class="art-caption"><span class="art-caption-dot"></span> Made for your every day</div>
+            <img src="{% static 'shop/hero-product.svg' %}" alt="A curated modern tech collection" fetchpriority="high">
+            <div class="art-note"><span>Thoughtfully picked</span><strong>Everyday, elevated.</strong></div>
+        </div>
+    </div>
+    <div class="container home-benefits">
+        <div><span class="benefit-icon">✦</span><span><strong>Good finds</strong><small>Picked with purpose</small></span></div>
+        <div><span class="benefit-icon">↗</span><span><strong>People behind it</strong><small>Shop independent sellers</small></span></div>
+        <div><span class="benefit-icon">♡</span><span><strong>Made to last</strong><small>Keep the things you love</small></span></div>
+    </div>
+</section>
+
+<section class="section home-section" id="categories">
+    <div class="container">
+        <div class="section-head">
+            <div><span class="section-eyebrow">A good place to start</span><h2>Browse by category</h2></div>
+            <a href="{% url 'product_list' %}" class="text-link">See everything <span aria-hidden="true">→</span></a>
+        </div>
+        <div class="categories">
+            {% for category in categories %}
+                <a href="{% url 'category_detail' category.slug %}" class="category-card">
+                    <span class="category-icon"><img src="{% static category.icon %}" alt="" width="32" height="32" loading="lazy"></span>
+                    <span class="category-info"><strong>{{ category.name }}</strong><span class="category-arrow" aria-hidden="true">↗</span></span>
+                </a>
+            {% empty %}
+                <div class="empty-state">New categories are on their way. Browse all products in the meantime.</div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<section class="section home-section home-featured" id="featured">
+    <div class="container">
+        <div class="section-head">
+            <div><span class="section-eyebrow">Worth a closer look</span><h2>Our current favorites</h2></div>
+            <a href="{% url 'product_list' %}" class="text-link">Shop all finds <span aria-hidden="true">→</span></a>
+        </div>
+        <div class="products-grid">
+            {% for product in featured_products %}
+                <article class="product-card">
+                    <a class="product-image" href="{% url 'product_detail' product.slug %}" aria-label="View {{ product.name }}">
+                        {% if product.images.first %}
+                            <img src="{{ product.images.first.image.url }}" alt="{{ product.name }}" loading="lazy">
+                        {% else %}
+                            <img src="{% static product.image %}" alt="{{ product.name }}" loading="lazy">
+                        {% endif %}
+                        <span class="product-tag">{{ product.category.name|default:'Featured find' }}</span>
+                    </a>
+                    <div class="product-body">
+                        <div class="product-meta">
+                            <h3><a href="{% url 'product_detail' product.slug %}">{{ product.name }}</a></h3>
+                            <span class="product-price">${{ product.price|floatformat:2 }}</span>
+                        </div>
+                        <p class="muted-copy">{{ product.description|truncatechars:84 }}</p>
+                        <div class="home-product-actions">
+                            <form method="post" action="{% url 'add_to_cart' product.slug %}">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-primary">Add to cart</button>
+                            </form>
+                            <form method="post" action="{% url 'wishlist_toggle' product.slug %}">
+                                {% csrf_token %}
+                                <button type="submit" class="icon-btn" aria-label="Save {{ product.name }} to wishlist">♡</button>
+                            </form>
+                        </div>
+                    </div>
+                </article>
+            {% empty %}
+                <div class="empty-state">We're getting our shelves ready. Check back soon for something good.</div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+{% if recommended_products %}
+<section class="section home-section recommendation-section">
+    <div class="container">
+        <div class="section-head">
+            <div><span class="section-eyebrow">Your taste, getting smarter</span><h2>A little more you</h2></div>
+            <span class="recommendation-note">Picked from what you've been exploring</span>
+        </div>
+        <div class="products-grid">
+            {% for product in recommended_products %}
+                <article class="product-card recommendation-card">
+                    <a class="product-image" href="{% url 'product_detail' product.slug %}" aria-label="View {{ product.name }}">
+                        {% if product.images.first %}
+                            <img src="{{ product.images.first.image.url }}" alt="{{ product.name }}" loading="lazy">
+                        {% else %}
+                            <img src="{% static product.image %}" alt="{{ product.name }}" loading="lazy">
+                        {% endif %}
+                        <span class="product-tag">Picked for you</span>
+                    </a>
+                    <div class="product-body">
+                        <div class="product-meta">
+                            <h3><a href="{% url 'product_detail' product.slug %}">{{ product.name }}</a></h3>
+                            <span class="product-price">${{ product.price|floatformat:2 }}</span>
+                        </div>
+                        <p class="muted-copy">{{ product.category.name|default:'A good find' }} · {{ product.description|truncatechars:60 }}</p>
+                        <div class="home-product-actions">
+                            <form method="post" action="{% url 'add_to_cart' product.slug %}">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-primary">Add to cart</button>
+                            </form>
+                            <form method="post" action="{% url 'compare_toggle' product.slug %}">
+                                {% csrf_token %}
+                                <button type="submit" class="icon-btn" aria-label="Compare {{ product.name }}">⇄</button>
+                            </form>
+                        </div>
+                    </div>
+                </article>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<section class="section home-section">
+    <div class="container seller-invite">
+        <div>
+            <span class="section-eyebrow">A marketplace with a human side</span>
+            <h2>Small shops.<br>Big ideas.</h2>
+            <p>Meet independent sellers bringing useful, beautiful things into the world. Find a new favorite shop—or bring your own to NovaCart.</p>
+            <div class="seller-invite-actions">
+                <a href="{% url 'product_list' %}" class="btn btn-primary">Meet the makers</a>
+                <a href="{% url 'create_listing' %}" class="btn btn-secondary">Start selling</a>
+            </div>
+        </div>
+        <div class="seller-invite-art" aria-hidden="true"><span>Made with<br><strong>intention.</strong></span></div>
+    </div>
+</section>
+
+<section class="section home-section home-newsletter">
+    <div class="container newsletter">
+        <div class="newsletter-content">
+            <span class="section-eyebrow">A note from NovaCart</span>
+            <h2>Good things, occasionally.</h2>
+            <p>Fresh finds and thoughtful ideas, sent only when we have something worth sharing.</p>
+        </div>
+        <form class="newsletter-form" action="{% url 'newsletter_subscribe' %}" method="post">
+            {% csrf_token %}
+            <label for="newsletter-email" class="sr-only">Email address</label>
+            <div class="input-wrapper"><input type="email" id="newsletter-email" name="email" placeholder="Your email address" autocomplete="email" required></div>
+            <button class="btn btn-primary" type="submit">Count me in <span aria-hidden="true">→</span></button>
+        </form>
+    </div>
+</section>
+{% endblock %}

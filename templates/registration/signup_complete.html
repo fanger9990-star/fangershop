@@ -1,0 +1,25 @@
+{% extends 'shop/base.html' %}
+
+{% block title %}Finish signing up | NovaCart{% endblock %}
+{% block content %}
+<section class="section auth-section">
+    <div class="container">
+        <div class="auth-card">
+            <span class="section-eyebrow">Almost there</span>
+            <h1>Make it yours.</h1>
+            <p class="auth-intro">Set up your account for <strong>{{ email }}</strong>.</p>
+            <form method="post" class="stacked-form">
+                {% csrf_token %}
+                {% for field in form %}
+                    <div class="field-group">
+                        <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                        {{ field }}
+                        {% if field.errors %}<div class="error-text">{{ field.errors }}</div>{% endif %}
+                    </div>
+                {% endfor %}
+                <button type="submit" class="btn btn-primary auth-submit">Create account</button>
+            </form>
+        </div>
+    </div>
+</section>
+{% endblock %}

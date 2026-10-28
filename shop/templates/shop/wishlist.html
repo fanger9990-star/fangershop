@@ -1,0 +1,49 @@
+{% extends 'shop/base.html' %}
+{% load static %}
+
+{% block title %}Wishlist | NovaCart{% endblock %}
+{% block description %}Save your favorite products and manage your NovaCart wishlist.{% endblock %}
+
+{% block content %}
+<section class="section">
+    <div class="container">
+        <div class="section-head">
+            <h1>My wishlist</h1>
+            <a href="{% url 'product_list' %}" class="btn-secondary">Continue shopping</a>
+        </div>
+
+        {% if products %}
+            <div class="products-grid">
+                {% for product in products %}
+                    <article class="product-card">
+                        <div class="product-image">
+                            {% if product.images.first %}
+                                <img src="{{ product.images.first.image.url }}" alt="{{ product.name }}">
+                            {% else %}
+                                <img src="{% static product.image %}" alt="{{ product.name }}">
+                            {% endif %}
+                            <form method="post" action="{% url 'wishlist_toggle' product.slug %}" class="wishlist-action">
+                                {% csrf_token %}
+                                <button type="submit" class="wishlist-btn" aria-label="Remove from wishlist">♥</button>
+                            </form>
+                        </div>
+                        <div class="product-body">
+                            <div class="product-meta">
+                                <h3><a href="{% url 'product_detail' product.slug %}">{{ product.name }}</a></h3>
+                                <span class="product-price">${{ product.price }}</span>
+                            </div>
+                            <p class="muted-copy">{{ product.description|truncatechars:90 }}</p>
+                            <div class="product-footer">
+                                <span>{{ product.stock }} in stock</span>
+                                <a href="{% url 'product_detail' product.slug %}" class="btn-secondary">View</a>
+                            </div>
+                        </div>
+                    </article>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="empty-state large">Your wishlist is empty. Save a few products you love to come back to later.</div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

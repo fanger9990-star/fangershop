@@ -1,0 +1,35 @@
+{% extends 'shop/base.html' %}
+
+{% block title %}Pricing | NovaCart{% endblock %}
+{% block description %}Compare NovaCart pricing plans for sellers and creators looking to scale their business.{% endblock %}
+
+{% block content %}
+<section class="section page-banner soft-panel">
+    <div class="container page-banner-inner narrow">
+        <div>
+            <span class="eyebrow">Simple pricing</span>
+            <h1>Choose the plan that grows with you</h1>
+        </div>
+    </div>
+</section>
+
+<section class="section">
+    <div class="container pricing-grid">
+        {% for plan in plans %}
+            <div class="pricing-card {% if plan.highlight %}highlight{% endif %}">
+                <div class="plan-header">
+                    <h3>{{ plan.name }}</h3>
+                    <div class="plan-price">{{ plan.price }}<span>/mo</span></div>
+                </div>
+                <p>{{ plan.description }}</p>
+                <ul>
+                    {% for feature in plan.features %}
+                        <li>{{ feature }}</li>
+                    {% endfor %}
+                </ul>
+                <a class="btn {% if not plan.highlight %}btn-secondary{% endif %}" href="{% url 'create_listing' %}">Get started</a>
+            </div>
+        {% endfor %}
+    </div>
+</section>
+{% endblock %}

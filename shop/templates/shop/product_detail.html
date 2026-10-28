@@ -1,0 +1,169 @@
+{% extends 'shop/base.html' %}
+{% load static %}
+
+{% block title %}{{ product.name }} | NovaCart{% endblock %}
+{% block description %}{{ product.description|truncatechars:155 }}{% endblock %}
+
+{% block content %}
+<section class="section product-detail-shell">
+    <div class="container product-detail-grid">
+        <div class="product-gallery">
+            {% if gallery %}
+                <div class="gallery-main">
+                    <img src="{{ gallery.0.url }}" alt="{{ product.name }}" class="detail-image" id="main-product-image">
+                </div>
+                {% if gallery|length > 1 %}
+                    <div class="gallery-thumbs">
+                        {% for photo in gallery %}
+                            <img src="{{ photo.url }}" alt="{{ photo.caption }}" class="thumb-image {% if forloop.first %}active{% endif %}" data-large="{{ photo.url }}">
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            {% else %}
+                <img src="{% static 'shop/product-watch.svg' %}" alt="{{ product.name }}" class="detail-image">
+            {% endif %}
+        </div>
+
+        <div class="product-summary">
+            <span class="eyebrow">{{ product.category.name|default:'Premium product' }}</span>
+            <h1>{{ product.name }}</h1>
+            <div class="rating-line">★★★★★ <span>{{ seller.rating|default:'4.9' }} rating · {{ product.stock }} in stock</span></div>
+            <div class="detail-price">${{ product.price|floatformat:2 }}</div>
+            <div class="detail-meta">
+                <span>In stock: {{ product.stock }}</span>
+                <span>Free shipping over $200</span>
+                {% if seller and seller.city %}
+                    <span>Location: {{ seller.city }}</span>
+                {% endif %}
+            </div>
+            <p>{{ product.description }}</p>
+
+            <div class="detail-actions">
+                <form method="post" action="{% url 'add_to_cart' product.slug %}">
+                    {% csrf_token %}
+                    <button class="btn btn-primary" type="submit">Add to cart</button>
+                </form>
+                <form method="post" action="{% url 'wishlist_toggle' product.slug %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-secondary">
+                        {% if product.id in wishlist_ids %}Saved to wishlist{% else %}Save to wishlist{% endif %}
+                    </button>
+                </form>
+                <form method="post" action="{% url 'compare_toggle' product.slug %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-secondary">
+                        {% if product.id in compare_ids %}Remove from comparison{% else %}⇄ Compare{% endif %}
+                    </button>
+                </form>
+                {% if product.seller %}
+                    <a href="{% url 'messages' %}?product={{ product.slug }}&seller={{ product.seller.id }}" class="btn btn-secondary">Contact seller</a>
+                {% endif %}
+                <a href="{% url 'cart' %}" class="btn btn-secondary">View cart</a>
+            </div>
+
+            <div class="info-panel">
+                <div class="info-item">
+                    <span>Shipping</span>
+                    <strong>2–4 business days</strong>
+                </div>
+                <div class="info-item">
+                    <span>Support</span>
+                    <strong>24/7 customer care</strong>
+                </div>
+                <div class="info-item">
+                    <span>Warranty</span>
+                    <strong>12-month protection</strong>
+                </div>
+            </div>
+
+            <ul class="feature-list">
+                <li>Fast shipping</li>
+                <li>Secure checkout</li>
+                <li>Warranty included</li>
+                <li>Easy 30-day returns</li>
+            </ul>
+        </div>
+    </div>
+</section>
+
+<section class="section detail-extra">
+    <div class="container product-detail-columns">
+        <div class="panel info-panel-box">
+            <h2>Why shoppers love it</h2>
+            <ul class="spec-list">
+                <li>Premium-grade materials and refined finish.</li>
+                <li>Designed for daily use with a clean, modern aesthetic.</li>
+                <li>Optimized performance and reliable build quality.</li>
+                <li>Backed by genuine support and warranty coverage.</li>
+            </ul>
+        </div>
+
+        <div class="panel seller-panel">
+            <h2>Sold by {{ seller.business_name|default:'NovaCart' }}</h2>
+            <div class="seller-card">
+                <div class="seller-avatar">{{ seller.business_name|default:'N'|slice:':1'|upper }}</div>
+                <div>
+                    <strong>{{ seller.business_name|default:'NovaCart Studio' }}</strong>
+                    <p>{% if seller.city %}{{ seller.city }} · {% endif %}Verified seller · {{ seller.rating|default:'4.9' }} average rating</p>
+                </div>
+            </div>
+            <div class="seller-stats">
+                <div><strong>{{ seller_product_count }}</strong><span>Listings</span></div>
+                <div><strong>{{ seller_sales_count }}</strong><span>Completed sales</span></div>
+                <div><strong>{{ seller.city|default:'—' }}</strong><span>Based in</span></div>
+            </div>
+            {% if seller.phone %}
+                <a href="tel:{{ seller.phone }}" class="btn-secondary contact-button">Contact seller</a>
+            {% endif %}
+        </div>
+    </div>
+</section>
+
+<section class="section">
+    <div class="container">
+        <div class="section-head">
+            <h2>Related products</h2>
+            <a href="{% url 'product_list' %}" class="btn-secondary">See all</a>
+        </div>
+
+        <div class="products-grid">
+            {% for item in related_products %}
+                <article class="product-card">
+                    <div class="product-image">
+                        <img src="{% static item.image %}" alt="{{ item.name }}">
+                    </div>
+                    <div class="product-body">
+                        <div class="product-meta">
+                            <h3><a href="{% url 'product_detail' item.slug %}">{{ item.name }}</a></h3>
+                            <span class="product-price">${{ item.price }}</span>
+                        </div>
+                    </div>
+                </article>
+            {% empty %}
+                <div class="empty-state">No related products available.</div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const mainImage = document.getElementById('main-product-image');
+        const thumbs = document.querySelectorAll('.thumb-image');
+
+        thumbs.forEach((thumb) => {
+            thumb.addEventListener('click', function () {
+                const nextSrc = this.dataset.large || this.src;
+                if (mainImage) {
+                    mainImage.src = nextSrc;
+                }
+
+                thumbs.forEach((item) => item.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+    });
+</script>
+{% endblock %}

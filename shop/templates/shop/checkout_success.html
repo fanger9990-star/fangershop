@@ -1,0 +1,24 @@
+{% extends 'shop/base.html' %}
+
+{% block title %}Order confirmed | NovaCart{% endblock %}
+{% block description %}Your order was placed successfully on NovaCart.{% endblock %}
+
+{% block content %}
+<section class="section">
+    <div class="container narrow-container">
+        <div class="panel success-panel">
+            <span class="eyebrow success-eyebrow">Success</span>
+            <h1>Thanks for your order!</h1>
+            <p>Your order <strong>#{{ order.id }}</strong> has been placed successfully and is now pending confirmation.</p>
+            <div class="summary-row">
+                <span>Total</span>
+                <strong>${{ order.total|floatformat:2 }}</strong>
+            </div>
+            <div class="success-actions">
+                <a href="{% url 'product_list' %}" class="btn">Continue shopping</a>
+                <a href="{% url 'profile' %}" class="btn-secondary">View profile</a>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

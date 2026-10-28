@@ -1,0 +1,102 @@
+{% extends 'shop/base.html' %}
+{% load static %}
+
+{% block title %}Product comparison | NovaCart{% endblock %}
+{% block description %}Compare products side by side and find the right fit for you.{% endblock %}
+
+{% block content %}
+<section class="section compare-page">
+    <div class="container">
+        <div class="compare-heading">
+            <div>
+                <span class="section-eyebrow">Less guesswork, better finds</span>
+                <h1>Find your <span class="gradient-text">perfect match.</span></h1>
+                <p>Put the details side by side. Your shortlist stays right here while you shop.</p>
+            </div>
+            <a href="{% url 'product_list' %}" class="btn btn-secondary">Keep exploring</a>
+        </div>
+
+        {% if products %}
+            <div class="comparison-scroll">
+                <table class="comparison-table">
+                    <thead>
+                        <tr>
+                            <th scope="col" class="comparison-label">At a glance</th>
+                            {% for product in products %}
+                                <th scope="col" class="comparison-product">
+                                    <div class="comparison-card">
+                                        <a href="{% url 'product_detail' product.slug %}" class="comparison-image">
+                                            {% if product.images.first %}
+                                                <img src="{{ product.images.first.image.url }}" alt="{{ product.name }}">
+                                            {% else %}
+                                                <img src="{% static product.image %}" alt="{{ product.name }}">
+                                            {% endif %}
+                                        </a>
+                                        <a href="{% url 'product_detail' product.slug %}" class="comparison-name">{{ product.name }}</a>
+                                        <span class="comparison-category">{{ product.category.name|default:'Independent find' }}</span>
+                                        <strong class="comparison-price {% if product.id == best_price_id %}comparison-best{% endif %}">
+                                            ${{ product.price|floatformat:2 }}
+                                            {% if product.id == best_price_id %}<small>Best available price</small>{% endif %}
+                                        </strong>
+                                        <form method="post" action="{% url 'compare_toggle' product.slug %}">
+                                            {% csrf_token %}
+                                            <button type="submit" class="remove-compare">Remove</button>
+                                        </form>
+                                        <form method="post" action="{% url 'add_to_cart' product.slug %}">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-primary comparison-buy">Add to cart</button>
+                                        </form>
+                                    </div>
+                                </th>
+                            {% endfor %}
+                            {% if products|length < compare_limit %}
+                                <th scope="col" class="comparison-add">
+                                    <a href="{% url 'product_list' %}">
+                                        <span aria-hidden="true">＋</span>
+                                        <strong>Add another</strong>
+                                        <small>Compare up to {{ compare_limit }} finds</small>
+                                    </a>
+                                </th>
+                            {% endif %}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <th scope="row">Category</th>
+                            {% for product in products %}<td>{{ product.category.name|default:'—' }}</td>{% endfor %}
+                            {% if products|length < compare_limit %}<td class="comparison-placeholder">Your next find</td>{% endif %}
+                        </tr>
+                        <tr>
+                            <th scope="row">Availability</th>
+                            {% for product in products %}
+                                <td>{% if product.stock %}<span class="availability available">{{ product.stock }} in stock</span>{% if product.id == most_stocked_id %}<small class="comparison-stock-note">Most available</small>{% endif %}{% else %}<span class="availability unavailable">Sold out</span>{% endif %}</td>
+                            {% endfor %}
+                            {% if products|length < compare_limit %}<td></td>{% endif %}
+                        </tr>
+                        <tr>
+                            <th scope="row">Seller</th>
+                            {% for product in products %}
+                                <td>{% if product.seller %}{% if product.seller.seller_profile %}{{ product.seller.seller_profile.business_name }}{% else %}{{ product.seller.username }}{% endif %}{% else %}NovaCart{% endif %}</td>
+                            {% endfor %}
+                            {% if products|length < compare_limit %}<td></td>{% endif %}
+                        </tr>
+                        <tr>
+                            <th scope="row">Description</th>
+                            {% for product in products %}<td class="comparison-description">{{ product.description|truncatechars:120 }}</td>{% endfor %}
+                            {% if products|length < compare_limit %}<td></td>{% endif %}
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <p class="compare-footnote">Prices and availability are updated from each seller's latest listing.</p>
+        {% else %}
+            <div class="compare-empty">
+                <span class="compare-empty-icon" aria-hidden="true">⇄</span>
+                <h2>Your shortlist starts here.</h2>
+                <p>Save up to {{ compare_limit }} products and see what makes each one special.</p>
+                <a href="{% url 'product_list' %}" class="btn btn-primary">Explore products</a>
+            </div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

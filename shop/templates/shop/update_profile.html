@@ -1,0 +1,38 @@
+{% extends 'shop/base.html' %}
+
+{% block title %}Edit Profile | NovaCart{% endblock %}
+{% block description %}Update your public seller information and improve your trust score.{% endblock %}
+
+{% block content %}
+<section class="section page-banner soft-panel">
+    <div class="container page-banner-inner narrow">
+        <div>
+            <span class="eyebrow">Seller settings</span>
+            <h1>Update your shop profile</h1>
+        </div>
+    </div>
+</section>
+
+<section class="section">
+    <div class="container form-card-wrap">
+        <div class="form-card">
+            <form method="post" class="stacked-form">
+                {% csrf_token %}
+                {{ form.non_field_errors }}
+                <div class="field-grid">
+                    {% for field in form %}
+                        <div class="field-group">
+                            <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                            {{ field }}
+                            {% if field.errors %}
+                                <div class="error-text">{{ field.errors }}</div>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                </div>
+                <button type="submit" class="btn">Save changes</button>
+            </form>
+        </div>
+    </div>
+</section>
+{% endblock %}

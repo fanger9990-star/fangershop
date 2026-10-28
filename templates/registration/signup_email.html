@@ -1,0 +1,25 @@
+{% extends 'shop/base.html' %}
+
+{% block title %}Create an account | NovaCart{% endblock %}
+{% block content %}
+<section class="section auth-section">
+    <div class="container">
+        <div class="auth-card">
+            <span class="section-eyebrow">A better kind of marketplace</span>
+            <h1>Make yourself at home.</h1>
+            <p class="auth-intro">Create an account to save favorites, talk to sellers, and find your people.</p>
+            {% if form.non_field_errors %}<div class="alert-box" role="alert">{{ form.non_field_errors }}</div>{% endif %}
+            <form method="post" class="stacked-form">
+                {% csrf_token %}
+                <div class="field-group">
+                    <label for="{{ form.email.id_for_label }}">Email address</label>
+                    {{ form.email }}
+                    {% if form.email.errors %}<div class="error-text">{{ form.email.errors }}</div>{% endif %}
+                </div>
+                <button type="submit" class="btn btn-primary auth-submit">Send verification code</button>
+            </form>
+            <p class="auth-footnote">Already have an account? <a href="{% url 'account_login' %}">Log in</a></p>
+        </div>
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,21 @@
+<svg width="900" height="700" viewBox="0 0 900 700" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="120" y1="60" x2="760" y2="660" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#111827"/>
+      <stop offset="1" stop-color="#020617"/>
+    </linearGradient>
+    <linearGradient id="watch" x1="270" y1="120" x2="620" y2="590" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#22C55E"/>
+      <stop offset="1" stop-color="#8B5CF6"/>
+    </linearGradient>
+  </defs>
+  <rect width="900" height="700" fill="url(#bg)"/>
+  <circle cx="450" cy="330" r="210" fill="url(#watch)" opacity="0.9"/>
+  <rect x="290" y="120" width="320" height="460" rx="84" fill="#101827" fill-opacity="0.88" stroke="#F8FAFC" stroke-opacity="0.12"/>
+  <rect x="328" y="162" width="244" height="380" rx="56" fill="#F8FAFC" fill-opacity="0.08"/>
+  <circle cx="450" cy="330" r="104" fill="#111827" stroke="#F8FAFC" stroke-opacity="0.2"/>
+  <circle cx="450" cy="330" r="72" fill="#F8FAFC" fill-opacity="0.12"/>
+  <path d="M450 330L450 270M450 330L515 360" stroke="#F8FAFC" stroke-width="12" stroke-linecap="round"/>
+  <circle cx="450" cy="330" r="12" fill="#F8FAFC"/>
+  <rect x="344" y="540" width="212" height="18" rx="9" fill="#F8FAFC" fill-opacity="0.16"/>
+</svg>

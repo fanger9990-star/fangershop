@@ -1,0 +1,29 @@
+{% extends 'shop/base.html' %}
+
+{% block title %}Personal details | NovaCart{% endblock %}
+{% block content %}
+<section class="section auth-section">
+    <div class="container">
+        <div class="auth-card">
+            <span class="section-eyebrow">A little about you</span>
+            <h1>Personal details.</h1>
+            <p class="auth-intro">Your sign-in email stays verified and cannot be changed here.</p>
+            <form method="post" class="stacked-form">
+                {% csrf_token %}
+                <div class="field-group">
+                    <label for="{{ form.first_name.id_for_label }}">First name</label>
+                    {{ form.first_name }}
+                    {% if form.first_name.errors %}<div class="error-text">{{ form.first_name.errors }}</div>{% endif %}
+                </div>
+                <div class="field-group">
+                    <label for="{{ form.last_name.id_for_label }}">Last name</label>
+                    {{ form.last_name }}
+                    {% if form.last_name.errors %}<div class="error-text">{{ form.last_name.errors }}</div>{% endif %}
+                </div>
+                <button type="submit" class="btn btn-primary auth-submit">Save details</button>
+            </form>
+            <p class="auth-footnote"><a href="{% url 'account' %}">Back to my account</a></p>
+        </div>
+    </div>
+</section>
+{% endblock %}

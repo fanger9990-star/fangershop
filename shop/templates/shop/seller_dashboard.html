@@ -1,0 +1,73 @@
+{% extends 'shop/base.html' %}
+
+{% block title %}Seller dashboard | NovaCart{% endblock %}
+{% block description %}Track listings, sales, and revenue from your NovaCart storefront.{% endblock %}
+
+{% block content %}
+<section class="section">
+    <div class="container dashboard-shell">
+        <div class="section-head">
+            <div>
+                <span class="eyebrow">Seller dashboard</span>
+                <h1>Store performance</h1>
+            </div>
+            <a href="{% url 'create_listing' %}" class="btn">Add new ad</a>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <strong>{{ total_listings }}</strong>
+                <span>Active listings</span>
+            </div>
+            <div class="stat-card">
+                <strong>{{ total_sales }}</strong>
+                <span>Sales</span>
+            </div>
+            <div class="stat-card">
+                <strong>${{ total_revenue|floatformat:2 }}</strong>
+                <span>Revenue</span>
+            </div>
+        </div>
+
+        <div class="dashboard-grid">
+            <div class="panel">
+                <h2>Recent listings</h2>
+                {% if products %}
+                    <ul class="dashboard-list">
+                        {% for product in products %}
+                            <li>
+                                <div>
+                                    <strong>{{ product.name }}</strong>
+                                    <span>{{ product.category.name|default:'General' }}</span>
+                                </div>
+                                <span>${{ product.price|floatformat:2 }}</span>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <div class="empty-state">No listings yet. Create your first ad to start selling.</div>
+                {% endif %}
+            </div>
+
+            <div class="panel">
+                <h2>Recent orders</h2>
+                {% if recent_orders %}
+                    <ul class="dashboard-list">
+                        {% for order in recent_orders %}
+                            <li>
+                                <div>
+                                    <strong>#{{ order.id }} - {{ order.customer_name }}</strong>
+                                    <span>{{ order.created_at|date:'M d, Y' }}</span>
+                                </div>
+                                <span>${{ order.total|floatformat:2 }}</span>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <div class="empty-state">No orders yet. Your orders will appear here once customers place them.</div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,58 @@
+{% extends 'shop/base.html' %}
+{% load static %}
+
+{% block title %}Profile | NovaCart{% endblock %}
+{% block description %}Manage your seller profile, shop statistics, and active inventory on NovaCart.{% endblock %}
+
+{% block content %}
+<section class="section profile-hero">
+    <div class="container profile-header">
+        <div class="profile-avatar">
+            <img src="{% static profile.avatar %}" alt="{{ profile.business_name }} avatar">
+        </div>
+        <div>
+            <span class="eyebrow">Seller profile</span>
+            <h1>{{ profile.business_name }}</h1>
+            <div class="profile-meta">
+                <span>{{ profile.city }}</span>
+                <span>★ {{ profile.rating }}</span>
+                <span>{{ profile.phone }}</span>
+            </div>
+            <p>{{ profile.bio }}</p>
+            <div class="detail-actions">
+                <a href="{% url 'update_profile' %}" class="btn">Edit profile</a>
+                <a href="{% url 'create_listing' %}" class="btn-secondary">Add new ad</a>
+                <a href="{% url 'seller_dashboard' %}" class="btn-secondary">Seller dashboard</a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="section">
+    <div class="container">
+        <div class="section-head">
+            <h2>Recent listings</h2>
+            <a href="{% url 'create_listing' %}" class="btn-secondary">Add new ad</a>
+        </div>
+
+        <div class="products-grid">
+            {% for product in products %}
+                <article class="product-card">
+                    <div class="product-image">
+                        <img src="{% static product.image %}" alt="{{ product.name }}">
+                    </div>
+                    <div class="product-body">
+                        <div class="product-meta">
+                            <h3><a href="{% url 'product_detail' product.slug %}">{{ product.name }}</a></h3>
+                            <span class="product-price">${{ product.price }}</span>
+                        </div>
+                        <p class="muted-copy">{{ product.description|truncatechars:80 }}</p>
+                    </div>
+                </article>
+            {% empty %}
+                <div class="empty-state">No products yet.</div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,24 @@
+{% extends 'shop/base.html' %}
+
+{% block title %}Verify your email | NovaCart{% endblock %}
+{% block content %}
+<section class="section auth-section">
+    <div class="container">
+        <div class="auth-card">
+            <span class="section-eyebrow">One quick check</span>
+            <h1>Check your inbox.</h1>
+            <p class="auth-intro">Enter the six-digit code we sent to <strong>{{ email }}</strong>. It expires in 10 minutes.</p>
+            <form method="post" class="stacked-form">
+                {% csrf_token %}
+                <div class="field-group">
+                    <label for="{{ form.code.id_for_label }}">Verification code</label>
+                    {{ form.code }}
+                    {% if form.code.errors %}<div class="error-text">{{ form.code.errors }}</div>{% endif %}
+                </div>
+                <button type="submit" class="btn btn-primary auth-submit">Verify email</button>
+            </form>
+            <p class="auth-footnote"><a href="{% url 'signup_email' %}">Use a different email</a></p>
+        </div>
+    </div>
+</section>
+{% endblock %}

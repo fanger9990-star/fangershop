@@ -1,0 +1,142 @@
+{% extends 'shop/base.html' %}
+{% load static %}
+
+{% block title %}Products | NovaCart{% endblock %}
+{% block description %}Browse premium items, filter by category, and discover the best deals.{% endblock %}
+
+{% block content %}
+<section class="section page-banner soft-panel">
+    <div class="container page-banner-inner">
+        <div>
+            <span class="eyebrow">Curated collection</span>
+            <h1>Discover premium products</h1>
+        </div>
+        <form class="search-box" method="get" action="{% url 'product_list' %}">
+            <input type="search" name="q" value="{{ request.GET.q|default:'' }}" placeholder="Search products...">
+            <button type="submit" class="btn">Search</button>
+        </form>
+    </div>
+</section>
+
+<section class="section">
+    <div class="container two-column-layout">
+        <aside class="sidebar-card">
+            <div class="sidebar-header">
+                <h3>Filters</h3>
+                <a href="{% url 'product_list' %}" class="sidebar-reset">Reset</a>
+            </div>
+
+            <form class="filter-form" method="get" action="{% url 'product_list' %}">
+                {% if query %}
+                    <input type="hidden" name="q" value="{{ query }}">
+                {% endif %}
+
+                <div class="field-group">
+                    <label for="category-filter">Category</label>
+                    <select id="category-filter" name="category">
+                        <option value="">All categories</option>
+                        {% for category in categories %}
+                            <option value="{{ category.slug }}" {% if current_category and current_category.slug == category.slug or request.GET.category == category.slug %}selected{% endif %}>{{ category.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="field-row">
+                    <div class="field-group">
+                        <label for="min-price">Min price</label>
+                        <input id="min-price" type="number" min="0" step="0.01" name="min_price" value="{{ min_price }}" placeholder="0">
+                    </div>
+                    <div class="field-group">
+                        <label for="max-price">Max price</label>
+                        <input id="max-price" type="number" min="0" step="0.01" name="max_price" value="{{ max_price }}" placeholder="500">
+                    </div>
+                </div>
+
+                <div class="field-group">
+                    <label for="city-filter">City</label>
+                    <select id="city-filter" name="city">
+                        <option value="">All cities</option>
+                        {% for city in cities %}
+                            <option value="{{ city }}" {% if selected_city == city %}selected{% endif %}>{{ city }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="field-group">
+                    <label for="sort-filter">Sort by</label>
+                    <select id="sort-filter" name="sort">
+                        <option value="newest" {% if selected_sort == 'newest' %}selected{% endif %}>Newest</option>
+                        <option value="price_asc" {% if selected_sort == 'price_asc' %}selected{% endif %}>Price: low to high</option>
+                        <option value="price_desc" {% if selected_sort == 'price_desc' %}selected{% endif %}>Price: high to low</option>
+                        <option value="name" {% if selected_sort == 'name' %}selected{% endif %}>Name</option>
+                    </select>
+                </div>
+
+                <div class="filter-actions">
+                    <button type="submit" class="btn">Apply</button>
+                    <a href="{% url 'product_list' %}" class="btn-secondary">Clear</a>
+                </div>
+            </form>
+        </aside>
+
+        <div class="catalog-column">
+            <div class="catalog-toolbar">
+                <div>
+                    <p class="toolbar-label">{{ products|length }} result{% if products|length != 1 %}s{% endif %}</p>
+                    {% if current_category %}
+                        <h2>{{ current_category.name }}</h2>
+                    {% elif query %}
+                        <h2>Search: {{ query }}</h2>
+                    {% else %}
+                        <h2>All products</h2>
+                    {% endif %}
+                </div>
+                <a href="{% url 'product_compare' %}" class="btn btn-secondary compare-toolbar-link">
+                    Compare products{% if compare_ids %} <span class="compare-count">{{ compare_ids|length }}</span>{% endif %}
+                </a>
+            </div>
+
+            <div class="catalog-grid">
+                {% for product in products %}
+                    <article class="product-card">
+                        <div class="product-image">
+                            {% if product.images.first %}
+                                <img src="{{ product.images.first.image.url }}" alt="{{ product.name }}">
+                            {% else %}
+                                <img src="{% static product.image %}" alt="{{ product.name }}">
+                            {% endif %}
+                            <span class="product-tag">{{ product.category.name|default:'Featured' }}</span>
+                            <form method="post" action="{% url 'wishlist_toggle' product.slug %}" class="wishlist-action">
+                                {% csrf_token %}
+                                <button type="submit" class="wishlist-btn" aria-label="Toggle wishlist">
+                                    {% if product.id in wishlist_ids %}♥{% else %}♡{% endif %}
+                                </button>
+                            </form>
+                            <form method="post" action="{% url 'compare_toggle' product.slug %}" class="compare-product-form">
+                                {% csrf_token %}
+                                <input type="hidden" name="next" value="{{ request.get_full_path }}">
+                                <button type="submit" class="compare-product-button {% if product.id in compare_ids %}is-selected{% endif %}" aria-pressed="{% if product.id in compare_ids %}true{% else %}false{% endif %}">
+                                    {% if product.id in compare_ids %}✓ Added{% else %}⇄ Compare{% endif %}
+                                </button>
+                            </form>
+                        </div>
+                        <div class="product-body">
+                            <div class="product-meta">
+                                <h3><a href="{% url 'product_detail' product.slug %}">{{ product.name }}</a></h3>
+                                <span class="product-price">${{ product.price }}</span>
+                            </div>
+                            <p class="muted-copy">{{ product.description|truncatechars:90 }}</p>
+                            <div class="product-footer">
+                                <span>{{ product.stock }} in stock</span>
+                                <a href="{% url 'product_detail' product.slug %}" class="btn-secondary">View</a>
+                            </div>
+                        </div>
+                    </article>
+                {% empty %}
+                    <div class="empty-state large">No products match your search yet. Try another category, price range, or city.</div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

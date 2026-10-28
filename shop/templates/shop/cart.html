@@ -1,0 +1,74 @@
+{% extends 'shop/base.html' %}
+{% load static %}
+
+{% block title %}Your cart | NovaCart{% endblock %}
+{% block description %}Review your selected products and complete your NovaCart purchase.{% endblock %}
+
+{% block content %}
+<section class="section cart-shell">
+    <div class="container cart-layout">
+        <div class="cart-panel">
+            <div class="section-head cart-head">
+                <h1>Your cart</h1>
+                <a href="{% url 'product_list' %}" class="btn btn-secondary">Continue shopping</a>
+            </div>
+
+            {% if cart_items %}
+                {% for item in cart_items %}
+                    <article class="cart-item">
+                        <div class="cart-thumb">
+                            {% if item.product.images.first %}
+                                <img src="{{ item.product.images.first.image.url }}" alt="{{ item.product.name }}">
+                            {% else %}
+                                <img src="{% static item.product.image %}" alt="{{ item.product.name }}">
+                            {% endif %}
+                        </div>
+
+                        <div class="cart-copy">
+                            <div class="cart-title-row">
+                                <h3>{{ item.product.name }}</h3>
+                                <form method="post" action="{% url 'remove_from_cart' item.product.slug %}">
+                                    {% csrf_token %}
+                                    <button type="submit" class="remove-link">Remove</button>
+                                </form>
+                            </div>
+                            <p>{{ item.product.category.name|default:'Premium product' }}</p>
+                            <div class="cart-meta-row">
+                                <span class="cart-price">${{ item.product.price|floatformat:2 }}</span>
+                                <form method="post" action="{% url 'update_cart_item' item.product.slug %}" class="quantity-form">
+                                    {% csrf_token %}
+                                    <label for="qty-{{ item.product.slug }}" class="sr-only">Quantity</label>
+                                    <input id="qty-{{ item.product.slug }}" type="number" name="quantity" min="1" value="{{ item.quantity }}">
+                                    <button type="submit" class="btn btn-secondary small-btn">Update</button>
+                                </form>
+                            </div>
+                        </div>
+                    </article>
+                {% endfor %}
+            {% else %}
+                <div class="empty-state cart-empty">
+                    Your cart is empty. Add a few premium essentials to get started.
+                </div>
+            {% endif %}
+        </div>
+
+        <aside class="cart-summary">
+            <h2>Order summary</h2>
+            <div class="summary-row">
+                <span>Subtotal</span>
+                <strong>${{ subtotal|floatformat:2 }}</strong>
+            </div>
+            <div class="summary-row">
+                <span>Shipping</span>
+                <strong>${{ shipping|floatformat:2 }}</strong>
+            </div>
+            <div class="summary-row total-row">
+                <span>Total</span>
+                <strong>${{ total|floatformat:2 }}</strong>
+            </div>
+            <a href="{% url 'checkout' %}" class="btn btn-primary checkout-btn">Proceed to checkout</a>
+            <p class="secure-note">Secure checkout · 256-bit encrypted</p>
+        </aside>
+    </div>
+</section>
+{% endblock %}

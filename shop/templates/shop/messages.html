@@ -1,0 +1,71 @@
+{% extends 'shop/base.html' %}
+
+{% block title %}Messages | NovaCart{% endblock %}
+{% block description %}Chat with sellers and manage conversations for your NovaCart purchases.{% endblock %}
+
+{% block content %}
+<section class="section">
+    <div class="container messages-layout">
+        <aside class="messages-sidebar panel">
+            <div class="section-head compact-head">
+                <h2>Inbox</h2>
+            </div>
+
+            {% if threads %}
+                {% for thread in threads %}
+                    <a href="{% url 'messages' %}?thread={{ thread.id }}" class="message-thread {% if active_thread and thread.id == active_thread.id %}active{% endif %}">
+                        <strong>{% if thread.seller_id == request.user.id %}{{ thread.buyer.username|default:'Buyer' }}{% else %}{{ thread.seller.username|default:'Seller' }}{% endif %}</strong>
+                        <span>{{ thread.product.name|default:'Product inquiry' }}</span>
+                    </a>
+                {% endfor %}
+            {% else %}
+                <div class="empty-state">No conversations yet.</div>
+            {% endif %}
+        </aside>
+
+        <div class="messages-panel panel">
+            {% if active_thread or product and seller %}
+                <div class="message-header">
+                    <div>
+                        <span class="eyebrow">Conversation</span>
+                        <h2>{% if active_thread %}{{ active_thread.product.name|default:'Product inquiry' }}{% else %}{{ product.name }}{% endif %}</h2>
+                    </div>
+                    {% if active_thread.product or product %}
+                        <a href="{% url 'product_detail' active_thread.product.slug|default:product.slug %}" class="btn-secondary">View product</a>
+                    {% endif %}
+                </div>
+
+                <div class="message-thread-body">
+                    {% if active_thread %}
+                        {% for message in active_thread.messages.all %}
+                            <div class="chat-bubble {% if message.sender == request.user %}mine{% endif %}">
+                                <small>{{ message.sender.username|default:'Seller' }}</small>
+                                <p>{{ message.content }}</p>
+                                <time>{{ message.created_at|date:'M d, Y H:i' }}</time>
+                            </div>
+                        {% empty %}
+                            <div class="empty-state">Start the conversation and send a message.</div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="empty-state">Start the conversation and send a message.</div>
+                    {% endif %}
+                </div>
+
+                <form method="post" class="message-compose">
+                    {% csrf_token %}
+                    {% if active_thread %}
+                        <input type="hidden" name="thread_id" value="{{ active_thread.id }}">
+                    {% else %}
+                        <input type="hidden" name="product" value="{{ product.slug }}">
+                        <input type="hidden" name="seller" value="{{ seller.id }}">
+                    {% endif %}
+                    <textarea name="message" rows="3" placeholder="Write a message..." required></textarea>
+                    <button type="submit" class="btn">Send message</button>
+                </form>
+            {% else %}
+                <div class="empty-state large">Choose a seller or product to start a conversation.</div>
+            {% endif %}
+        </div>
+    </div>
+</section>
+{% endblock %}
