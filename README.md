@@ -4,7 +4,79 @@ NovaCart is a Django marketplace with product discovery, seller listings, carts 
 
 Shopping features include session-based personalized recommendations from recently viewed categories, a four-product side-by-side comparison, and a private customer account area with profile details, order history, saved products, recently viewed items, and conversations.
 
-## Local development
+## Screenshots
+
+### Home page
+
+![NovaCart home page](images/image%20copy%202.png)
+
+### Seller page
+
+![NovaCart seller page](images/image%20copy%203.png)
+
+### Shopping cart
+
+![NovaCart shopping cart](images/image%20copy.png)
+
+### Sign up
+
+![NovaCart sign-up page](images/image.png)
+
+## Get started
+
+### Clone the repository
+
+Install [Git](https://git-scm.com/downloads), then clone this repository:
+
+```sh
+git clone https://github.com/fanger9990-star/fangershop.git
+cd fangershop
+```
+
+Alternatively, open the repository page on GitHub, select **Code**, and choose **Download ZIP**. Extract the ZIP file before opening the project.
+
+### Open the project in VS Code
+
+Install [Visual Studio Code](https://code.visualstudio.com/), then open the project folder:
+
+1. In VS Code, select **File > Open Folder...** and choose the cloned `fangershop` folder.
+2. Open the integrated terminal with **Terminal > New Terminal**.
+3. If prompted, trust the project folder so VS Code can enable its features.
+
+You can also open a terminal in the project folder and run:
+
+```sh
+code .
+```
+
+### Install recommended extensions
+
+In VS Code, open the Extensions view with **Ctrl+Shift+X** (Windows/Linux) or **Cmd+Shift+X** (macOS), search for each extension, and select **Install**:
+
+- **Python** by Microsoft (`ms-python.python`) — Python support, interpreter selection, and debugging.
+- **Python Debugger** by Microsoft (`ms-python.debugpy`) — Python debugging support.
+- **Django** by Baptiste Daroussin (`batisteo.vscode-django`) — Django template syntax support.
+- **GitHub Pull Requests** by GitHub (`GitHub.vscode-pull-request-github`) — work with GitHub pull requests and issues in VS Code.
+
+Extensions are optional; the project can also be run from a terminal. To use GitHub features in VS Code, sign in when prompted. To choose the project interpreter, open the Command Palette (**Ctrl+Shift+P** / **Cmd+Shift+P**), run **Python: Select Interpreter**, and select the project's `.venv` interpreter after creating it.
+
+## Run locally
+
+You need Python 3.12 or newer and Git. From the project root, create a virtual environment and install the dependencies:
+
+```sh
+python -m venv .venv
+. .venv/bin/activate
+pip install -r requirements.txt
+```
+
+On Windows PowerShell, activate the environment with:
+
+```powershell
+.\.venv\Scripts\Activate.ps1
+```
+
+If PowerShell prevents activation, you can use the virtual environment's Python directly (for example, `.\.venv\Scripts\python.exe -m pip install -r requirements.txt`).
 
 Copy the sample environment file and adjust the values for your local setup:
 
@@ -15,15 +87,16 @@ cp .env.example .env
 Then from the project root:
 
 ```sh
-python -m venv .venv
-. .venv/bin/activate
-pip install -r requirements.txt
 set -a
 source .env
 set +a
 python manage.py migrate
 python manage.py runserver
 ```
+
+On Windows PowerShell, copy the sample file with `Copy-Item .env.example .env`. The development settings work without loading `.env`; to set environment variables in PowerShell, use `$env:DJANGO_DEBUG = "True"` and `$env:DJANGO_SECRET_KEY = "local-development-key"` before running `python manage.py migrate` and `python manage.py runserver`.
+
+Open [http://127.0.0.1:8000/](http://127.0.0.1:8000/) in your browser. Stop the development server with **Ctrl+C** in the terminal.
 
 By default, local development prints verification email to the runserver console; it does not deliver email to an inbox. To deliver signup codes through Gmail, enable 2-Step Verification for the Google account, create an App Password, and set these variables in the same terminal that starts Django:
 
